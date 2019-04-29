@@ -2,28 +2,32 @@
 
 A step-by-step guide on how to get the Robot-Shop running in Kubernetes.
 
-First two levels of the service dependencies:
+The Robot-Shop has the following services:
 
-```
-web (nginx)
-    -> catalogue (nodejs)
-        -> mongodb
-    -> user (nodejs)
-        -> mongodb
-        -> redis
-    -> cart (nodejs)
-        -> redis
-        -> catalgue
-    -> shipping (java)
-        -> mysql
-        -> cart
-    -> payment (python)
-        -> rabbitmq
-        -> cart
-        -> user
-    -> ratings (php)
-        -> mysql
-```
+
+* web (nginx) [service](./descriptors/web-service.yaml) [deployment](./descriptors/web-deployment.yaml)
+    * -> catalogue (nodejs)
+        * -> mongodb
+    * -> user (nodejs)
+        * -> mongodb
+        * -> redis
+    * -> cart (nodejs)
+        * -> redis
+        * -> catalgue
+            * -> ...  
+    * -> shipping (java)
+        * -> mysql
+        * -> cart
+            * -> ...
+    * -> payment (python)
+        * -> rabbitmq
+        * -> cart
+            * -> ...
+        * -> user
+            * -> ...
+    * -> ratings (php)
+        * -> mysql
+
 
 
 ## Namespace
