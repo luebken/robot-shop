@@ -5,28 +5,28 @@ A step-by-step guide on how to get the Robot-Shop running in Kubernetes.
 The Robot-Shop has the following services:
 
 
-* web (nginx): [service](./descriptors/web-service.yaml), [deployment](./descriptors/web-deployment.yaml)
-    * -> catalogue (nodejs): [service](./descriptors/catalogue-service.yaml), [deployment](./descriptors/catalogue-deployment.yaml)
-        * -> mongodb: [service](./descriptors/mongodb-service.yaml), [deployment](./descriptors/mongodb-deployment.yaml)
-    * -> user (nodejs) [service](./descriptors/user-service.yaml), [deployment](./descriptors/user-deployment.yaml)
-        * -> mongodb: [](./descriptors/mongodb-service.yaml), [](./descriptors/mongodb-deployment.yaml)
-        * -> redis: [](./descriptors/redis-service.yaml), [](./descriptors/redis-deployment.yaml)
-    * -> cart (nodejs): [](./descriptors/cart-service.yaml), [](./descriptors/cart-deployment.yaml)
-        * -> redis: [](./descriptors/redis-service.yaml), [](./descriptors/redis-deployment.yaml)
-        * -> catalgue: [](./descriptors/catalogue-service.yaml), [](./descriptors/catalogue-deployment.yaml)
+* web (nginx): [web-service.yaml](./descriptors/web-service.yaml), [deployment](./descriptors/web-deployment.yaml)
+    * -> catalogue (nodejs): [catalogue-service.yaml](./descriptors/catalogue-service.yaml), [deployment](./descriptors/catalogue-deployment.yaml)
+        * -> mongodb: [mongodb-service.yaml](./descriptors/mongodb-service.yaml), [deployment](./descriptors/mongodb-deployment.yaml)
+    * -> user (nodejs) [user-service.yaml](./descriptors/user-service.yaml), [deployment](./descriptors/user-deployment.yaml)
+        * -> mongodb: [mongodb-service.yaml](./descriptors/mongodb-service.yaml), [](./descriptors/mongodb-deployment.yaml)
+        * -> redis: [redis-service.yaml](./descriptors/redis-service.yaml), [](./descriptors/redis-deployment.yaml)
+    * -> cart (nodejs): [cart-service.yaml](./descriptors/cart-service.yaml), [](./descriptors/cart-deployment.yaml)
+        * -> redis: [redis-service.yaml](./descriptors/redis-service.yaml), [](./descriptors/redis-deployment.yaml)
+        * -> catalgue: [catalogue-service.yaml](./descriptors/catalogue-service.yaml), [](./descriptors/catalogue-deployment.yaml)
             * -> ...  
-    * -> shipping (java): [](./descriptors/shipping-service.yaml), [](./descriptors/shipping-deployment.yaml)
-        * -> mysql: [](./descriptors/mysql-service.yaml), [](./descriptors/mysql-deployment.yaml)
-        * -> cart: [](./descriptors/cart-service.yaml), [](./descriptors/cart-deployment.yaml)
+    * -> shipping (java): [shipping-service.yaml](./descriptors/shipping-service.yaml), [](./descriptors/shipping-deployment.yaml)
+        * -> mysql: [mysql-service.yaml](./descriptors/mysql-service.yaml), [](./descriptors/mysql-deployment.yaml)
+        * -> cart: [cart-service.yaml](./descriptors/cart-service.yaml), [](./descriptors/cart-deployment.yaml)
             * -> ...
-    * -> payment (python): [](./descriptors/payment-service.yaml), [](./descriptors/payment-deployment.yaml)
-        * -> rabbitmq: [](./descriptors/rabbitmq-service.yaml), [](./descriptors/rabbitmq-deployment.yaml)
-        * -> cart: [](./descriptors/cart-service.yaml), [](./descriptors/cart-deployment.yaml)
+    * -> payment (python): [payment-service.yaml](./descriptors/payment-service.yaml), [](./descriptors/payment-deployment.yaml)
+        * -> rabbitmq: [rabbitmq-service.yaml](./descriptors/rabbitmq-service.yaml), [](./descriptors/rabbitmq-deployment.yaml)
+        * -> cart: [cart-service.yaml](./descriptors/cart-service.yaml), [](./descriptors/cart-deployment.yaml)
             * -> ...
-        * -> user  [](./descriptors/user-service.yaml), [](./descriptors/user-deployment.yaml)
+        * -> user  [user-service.yaml](./descriptors/user-service.yaml), [](./descriptors/user-deployment.yaml)
             * -> ...
-    * -> ratings (php) [](./descriptors/ratings-service.yaml), [](./descriptors/ratings-deployment.yaml)
-        * -> mysql [](./descriptors/mysql-service.yaml), [](./descriptors/mysql-deployment.yaml)
+    * -> ratings (php) [ratings-service.yaml](./descriptors/ratings-service.yaml), [](./descriptors/ratings-deployment.yaml)
+        * -> mysql [mysql-service.yaml](./descriptors/mysql-service.yaml), [](./descriptors/mysql-deployment.yaml)
 
 
 
