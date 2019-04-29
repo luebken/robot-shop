@@ -5,28 +5,28 @@ A step-by-step guide on how to get the Robot-Shop running in Kubernetes.
 The Robot-Shop has the following services:
 
 
-* web (nginx) [service](./descriptors/web-service.yaml) [deployment](./descriptors/web-deployment.yaml)
-    * -> catalogue (nodejs)
-        * -> mongodb
-    * -> user (nodejs)
-        * -> mongodb
-        * -> redis
-    * -> cart (nodejs)
-        * -> redis
-        * -> catalgue
+* web (nginx): [service](./descriptors/web-service.yaml), [deployment](./descriptors/web-deployment.yaml)
+    * -> catalogue (nodejs): [service](./descriptors/catalogue-service.yaml), [deployment](./descriptors/catalogue-deployment.yaml)
+        * -> mongodb: [service](./descriptors/mongodb-service.yaml), [deployment](./descriptors/mongodb-deployment.yaml)
+    * -> user (nodejs) [service](./descriptors/user-service.yaml), [deployment](./descriptors/user-deployment.yaml)
+        * -> mongodb: [](./descriptors/mongodb-service.yaml), [](./descriptors/mongodb-deployment.yaml)
+        * -> redis: [](./descriptors/redis-service.yaml), [](./descriptors/redis-deployment.yaml)
+    * -> cart (nodejs): [](./descriptors/cart-service.yaml), [](./descriptors/cart-deployment.yaml)
+        * -> redis: [](./descriptors/redis-service.yaml), [](./descriptors/redis-deployment.yaml)
+        * -> catalgue: [](./descriptors/catalogue-service.yaml), [](./descriptors/catalogue-deployment.yaml)
             * -> ...  
-    * -> shipping (java)
-        * -> mysql
-        * -> cart
+    * -> shipping (java): [](./descriptors/shipping-service.yaml), [](./descriptors/shipping-deployment.yaml)
+        * -> mysql: [](./descriptors/mysql-service.yaml), [](./descriptors/mysql-deployment.yaml)
+        * -> cart: [](./descriptors/cart-service.yaml), [](./descriptors/cart-deployment.yaml)
             * -> ...
-    * -> payment (python)
-        * -> rabbitmq
-        * -> cart
+    * -> payment (python): [](./descriptors/payment-service.yaml), [](./descriptors/payment-deployment.yaml)
+        * -> rabbitmq: [](./descriptors/rabbitmq-service.yaml), [](./descriptors/rabbitmq-deployment.yaml)
+        * -> cart: [](./descriptors/cart-service.yaml), [](./descriptors/cart-deployment.yaml)
             * -> ...
-        * -> user
+        * -> user  [](./descriptors/user-service.yaml), [](./descriptors/user-deployment.yaml)
             * -> ...
-    * -> ratings (php)
-        * -> mysql
+    * -> ratings (php) [](./descriptors/ratings-service.yaml), [](./descriptors/ratings-deployment.yaml)
+        * -> mysql [](./descriptors/mysql-service.yaml), [](./descriptors/mysql-deployment.yaml)
 
 
 
