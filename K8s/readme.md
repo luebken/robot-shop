@@ -2,7 +2,7 @@
 
 A step-by-step guide on how to get the Robot-Shop running in Kubernetes.
 
-The Robot-Shop has the following services:
+The Robot-Shop has the following Kubernetes services and deployments defined in the [descriptors](../descriptors/) directory:
 
 
 * web (nginx): [web-service.yaml](./descriptors/web-service.yaml), [web-deployment.yaml](./descriptors/web-deployment.yaml)
@@ -28,6 +28,12 @@ The Robot-Shop has the following services:
     * -> ratings (php) [ratings-service.yaml](./descriptors/ratings-service.yaml), [ratings-deployment.yaml](./descriptors/ratings-deployment.yaml)
         * -> mysql [mysql-service.yaml](./descriptors/mysql-service.yaml), [mysql-deployment.yaml](./descriptors/mysql-deployment.yaml)
 
+
+## Instana Agent
+
+If not done already install the Instana agent: 
+
+    $ helm install --name instana-agent --namespace instana-agent --set agent.key=INSTANA_AGENT_KEY --set zone.name=CLUSTER_NAME
 
 
 ## Namespace
