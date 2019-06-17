@@ -6,8 +6,23 @@ A step-by-step guide on how to get the Robot-Shop running in Kubernetes.
 
 If not done already install the Instana agent:
 
+    # Helm
     $ helm init --service-account tiller
     $ helm install --name instana-agent --namespace instana-agent --set agent.key=INSTANA_AGENT_KEY --set zone.name=CLUSTER_NAME
+
+    # Yaml
+    # https://docs.instana.io/quick_start/agent_setup/container/kubernetes/#example-yaml-file
+    # kubectl apply -f instana-agent.yaml
+
+    # Troublshooting
+    mkdir instana-agent-logs
+    for p in $(kubectl get pods --namespace instana-agent | cut -f 1 -d ' '); do
+    if [[ $p != "NAME" ]]
+    then
+    kubectl logs $p -c instana-agent --namespace instana-agent > instana-agent-logs/$p-instana-agent.log
+    kubectl logs $p -c instana-agent-leader-elector --namespace instana-agent > instana-agent-logs/$p-instana-agent-leader-elector.log
+    fi
+    done
 
 ## Services overview
 
@@ -43,6 +58,7 @@ Let's start by creatng the catalogue & cart service with their respective backen
 
     # create a dedicated namespace
     $ kubectl create ns robot-shop
+
     # switch to that namaspace for kubectl
     $ kubectl config set-context --current --namespace=robot-shop
 
