@@ -49,6 +49,11 @@ app.get('/health', (req, res) => {
     res.json(stat);
 });
 
+// dummy
+app.get('/metrics', (req, res) => {
+    // include help
+    res.send('cart_items_total{a_dummy_key="a_dummy_label"}  42');
+});
 
 // get cart with id
 app.get('/cart/:id', (req, res) => {
