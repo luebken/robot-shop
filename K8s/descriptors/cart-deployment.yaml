@@ -13,6 +13,9 @@ spec:
     metadata:
       labels:
         service: cart
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8080'
     spec:
       containers:
       - name: cart
