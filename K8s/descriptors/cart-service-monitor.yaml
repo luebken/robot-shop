@@ -3,8 +3,11 @@ kind: ServiceMonitor
 metadata:
   name: cart-service-monitor
 spec:
+  namespaceSelector:
+      matchNames:
+      - robot-shop
   selector:
     matchLabels:
-      name: cart
+      service: cart
   endpoints:
   - port: http
