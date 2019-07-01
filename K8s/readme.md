@@ -60,7 +60,7 @@ Let's start by creatng the catalogue & cart service with their respective backen
     $ kubectl create ns robot-shop
 
     # switch to that namaspace for kubectl
-    $ kubectl config set-context --current --namespace=robot-shop
+    $ kubectl config set-context $(kubectl config current-context) --namespace=robot-shop
 
     # create catalogue deployment & service & mongodb backend
     # https://github.com/instana/robot-shop/blob/master/catalogue/server.js
