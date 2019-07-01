@@ -152,3 +152,7 @@ To bring up the whole robot-shop deploy the rest of the services:
 
     # artificial scaling
     kubectl apply -f K8s/descriptors/cart-scaler.yaml
+
+## Termination 
+
+https://kubernetes.io/docs/tasks/debug-application-cluster/determine-reason-pod-failure/
