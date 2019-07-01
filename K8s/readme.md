@@ -156,3 +156,8 @@ To bring up the whole robot-shop deploy the rest of the services:
 ## Termination 
 
 https://kubernetes.io/docs/tasks/debug-application-cluster/determine-reason-pod-failure/
+
+## Istio
+
+install https://istio.io/docs/setup/kubernetes/install/kubernetes/
+(WIP got it working for cart service)
