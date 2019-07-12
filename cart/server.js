@@ -13,11 +13,20 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const pino = require('pino');
 const expPino = require('express-pino-logger');
+const client = require('prom-client');
+const Registry = client.Registry;
+const register = new Registry();
 
 var redisConnected = false;
 
 var redisHost = process.env.REDIS_HOST || 'redis'
 var catalogueHost = process.env.CATALOGUE_HOST || 'catalogue'
+
+const counter = new client.Counter({
+    name: 'cart_items_total',
+    help: 'all items in all carts.',
+    registers: [register]
+});
 
 const logger = pino({
     level: 'info',
@@ -49,13 +58,9 @@ app.get('/health', (req, res) => {
     res.json(stat);
 });
 
-// dummy
+// prometheus metrics
 app.get('/metrics', (req, res) => {
-    var metrics = '';
-    metrics += '# HELP cart_items_total all items in all carts. Currently dummy\n';
-    metrics += '# TYPE cart_items_total counter\n';
-    metrics += 'cart_items_total{a_dummy_key="a_dummy_label"} 42\n';
-    res.send(metrics);
+    res.send(register.metrics());
 });
 
 // get cart with id
@@ -173,6 +178,7 @@ app.get('/add/:id/:sku/:qty', (req, res) => {
 
                 // save the new cart
                 saveCart(req.params.id, cart).then((data) => {
+                    counter.inc(qty);
                     res.json(cart);
                 }).catch((err) => {
                     req.log.error(err);
