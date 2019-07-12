@@ -161,3 +161,24 @@ https://kubernetes.io/docs/tasks/debug-application-cluster/determine-reason-pod-
 
 install https://istio.io/docs/setup/kubernetes/install/kubernetes/
 (WIP got it working for cart service)
+
+## Prometheus
+
+install TODO describe the operator magic
+K8s/descriptors/kube-prometheus-robotshop/example.jsonnet
+
+expose the grafana service (pass admin/admin)
+kubectl expose deployment grafana --type=LoadBalancer --name=test-grafana -n monitoring
+
+ curl localhost:32768/metrics
+# HELP cart_items_total all items in all carts. Currently dummy
+# TYPE cart_items_total counter
+cart_items_total{a_dummy_key="a_dummy_label"} 42
+
+https://github.com/coreos/kube-prometheus
+
+
+com.instana.plugin.prometheus:
+  customMetricSources:
+  - url: '/metrics' # url path part which expose metrics
+    metricNameIncludeRegex: '^cart'
