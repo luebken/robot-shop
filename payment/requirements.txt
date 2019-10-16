@@ -1,4 +1,7 @@
+uwsgi
 Flask
 requests
 pika
-instana
+prometheus_client
+opentracing
+instana==1.15.3

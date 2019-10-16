@@ -24,24 +24,34 @@ To see the application performance results in the Instana dashboard, you will fi
 ## Build from Source
 To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the *.env* file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
 
-    $ docker-compose build
+```shell
+$ docker-compose build
+```
 
 If you modified the *.env* file and changed the image registry, you may need to push the images to that registry
 
-    $ docker-compose push
+```shell
+$ docker-compose push
+```
 
 ## Run Locally
 You can run it locally for testing.
 
 If you did not build from source, don't worry all the images are on Docker Hub. Just pull down those images first using:
 
-    $ docker-compose pull
+```shell
+$ docker-compose pull
+```
 
 Fire up Stan's Robot Shop with:
 
-    $ docker-compose up
+```shell
+$ docker-compose up
+```
 
 If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
+
+There is also limited support on ARM architectures at the moment.
 
 ## Marathon / DCOS
 
@@ -50,56 +60,85 @@ The manifests for robotshop are in the *DCOS/* directory. These manifests were b
 You may install Instana via the DCOS package manager, instructions are here: https://github.com/dcos/examples/tree/master/instana-agent/1.9
 
 ## Kubernetes
-The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/). The deployment and service definition files using these images are in the *K8s* directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your registry the deployment files will need to be updated to pull from your registry; using [kompose](https://github.com/kubernetes/kompose) may be of assistance here.
+You can run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube) or on one of the many cloud providers.
 
-If you want to deploy Stan's Robot Shop to Google Compute you will need to edit the *K8s/web-service.yaml* file and change the type from NodePort to LoadBalancer. This can also be done in the Google Compute console.
+The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/). The deployment and service definition files using these images are in the [K8s](K8s/README.md) directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your registry the deployment files will need to be updated to pull from your registry.
 
-#### NOTE
-I have found some issues with kompose reading the *.env* correctly, just export the variables in the shell environment to work around this.
+```shell
+$ kubectl create namespace robot-shop
+$ kubectl -n robot-shop apply -f K8s/descriptors
+```
 
-You can also run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube).
+To deploy the Instana agent to Kubernetes, just use the [helm](https://hub.helm.sh/charts/stable/instana-agent) chart.
 
-    $ kubectl create namespace robot-shop
-    $ kubectl -n robot-shop create -f K8s/descriptors
+```shell
+$ helm install --name instana-agent --namespace instana-agent \
+--set agent.key=INSTANA_AGENT_KEY \
+--set agent.endpointHost=HOST \
+--set agent.endpointPort=PORT \
+--set zone.name=CLUSTER_NAME \
+stable/instana-agent
+```
 
-To deploy the Instana agent to Kubernetes, just use the [helm](https://github.com/instana/instana-agent-helm-chart) chart. Edit *values.yaml* and set zone, endpoint host, endpoint port and key to your values, see the README file for the helm chart.
-
-    $ cd instana-agent-helm-chart
-    $ helm install --name instana-agent --namespace instana-agent .
-
-If you are having difficulties get helm running with your K8s install it is most likely due to RBAC, most K8s now have RBAC enabled by default. Therefore helm requires a [service account](https://github.com/helm/helm/blob/master/docs/rbac.md) to have permission to do stuff.
+If you are having difficulties getting helm running with your K8s install, it is most likely due to RBAC, most K8s now have RBAC enabled by default. Therefore helm requires a [service account](https://github.com/helm/helm/blob/master/docs/rbac.md) to have permission to do stuff.
 
 ## Accessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
 
 If you are running the store on Kubernetes via minikube then, to make the store front accessible edit the *web* service definition and change the type to *NodePort* and add a port entry *nodePort: 30080*.
 
-    $ kubectl -n robot-shop edit service web
+```shell
+$ kubectl -n robot-shop edit service web
+```
 
 Snippet
 
-    spec:
-      ports:
-      - name: "8080"
-        port: 8080
-        protocol: TCP
-        targetPort: 8080
-        nodePort: 30080
-      selector:
-        io.kompose.service: web
-      sessionAffinity: None
-      type: NodePort
+```yaml
+spec:
+  ports:
+  - name: "8080"
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 30080
+  selector:
+    service: web
+  sessionAffinity: None
+  type: NodePort
+```
 
 The store front is then available on the IP address of minikube port 30080. To find the IP address of your minikube instance.
 
-    $ minikube ip
+```shell
+$ minikube ip
+```
 
-If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system. There will be specific blog posts on the Instana site covering these scenarios.
+If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system.
 
 ## Load Generation
-A separate load generation utility is provided in the *load-gen* directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The *build.sh* script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the *.env* file in the parent directory. The script *load-gen.sh* runs the image, edit this and set the HOST environment variable to point the load at where you are running the application. You could run this inside an orchestration system (K8s) as well if you want to, how to do this is left as an exercise for the reader.
+A separate load generation utility is provided in the *load-gen* directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The *build.sh* script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the *.env* file in the parent directory. The script *load-gen.sh* runs the image, it takes a number of command line arguments. You could run the container inside an orchestration system (K8s) as well if you want to, an example descriptor is provided in K8s/autoscaling. For more details see the [README](load-gen/README.md) in the load-gen directory.
 
 ## End User Monitoring
 To enable End User Monitoring (EUM) see the official [documentation](https://docs.instana.io/products/website_monitoring/) for how to create a configuration. There is no need to inject the javascript fragment into the page, this will be handled automatically. Just make a note of the unique key and set the environment variable INSTANA_EUM_KEY for the *web* image, see *docker-compose.yaml* for an example.
 
 If you are running the Instana backend on premise, you will also need to set the Reporting URL to your local instance. Set the environment variable INSTANA_EUM_REPORTING_URL as above. See the Instana EUM API [reference](https://docs.instana.io/products/website_monitoring/api/#api-structure)
+
+## Prometheus
+
+The cart and payment services both have Prometheus metric endpoints. These are accessible on `/metrics`. The cart service provides:
+
+* Counter of the number of items added to the cart
+
+The payment services provides:
+
+* Counter of the number of items perchased
+* Histogram of the total number of items in each cart
+* Histogram of the total value of each cart
+
+To test the metrics use:
+
+```shell
+$ curl http://<host>:8080/api/cart/metrics
+$ curl http://<host>:8080/api/payment/metrics
+```
+
