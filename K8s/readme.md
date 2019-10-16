@@ -144,7 +144,7 @@ To bring up the whole robot-shop deploy the rest of the services:
 
     # create some artificial load
     $ kubectl create ns robot-shop-load
-    $ kubectl run --env HOST=http://35.188.69.251:80 --env NUM_CLIENTS=3 loadgen --image robotshop/rs-load-load
+    $ kubectl run --env HOST=http://34.67.61.154:80 --env NUM_CLIENTS=3 loadgen --image robotshop/rs-load-load
 
 //TODO gif from dependencies in instana
 
@@ -162,7 +162,63 @@ https://kubernetes.io/docs/tasks/debug-application-cluster/determine-reason-pod-
 install https://istio.io/docs/setup/kubernetes/install/kubernetes/
 (WIP got it working for cart service)
 
-## Prometheus
+## Prometheus Server
+
+Build upon
+https://github.com/coreos/kube-prometheus
+
+Create Prometheus descriptors:
+https://github.com/coreos/kube-prometheus#customizing-kube-prometheus
+```
+local kp =
+  (import 'kube-prometheus/kube-prometheus.libsonnet') +
+  {
+    _config+:: {
+      namespace: 'monitoring',
+
+      prometheus+:: {
+        namespaces: ["default","kube-system","robot-shop","monitoring"],
+      },
+    },
+  };
+
+{ ['00namespace-' + name]: kp.kubePrometheus[name] for name in std.objectFields(kp.kubePrometheus) } +
+{ ['0prometheus-operator-' + name]: kp.prometheusOperator[name] for name in std.objectFields(kp.prometheusOperator) } +
+{ ['node-exporter-' + name]: kp.nodeExporter[name] for name in std.objectFields(kp.nodeExporter) } +
+{ ['kube-state-metrics-' + name]: kp.kubeStateMetrics[name] for name in std.objectFields(kp.kubeStateMetrics) } +
+{ ['alertmanager-' + name]: kp.alertmanager[name] for name in std.objectFields(kp.alertmanager) } +
+{ ['prometheus-' + name]: kp.prometheus[name] for name in std.objectFields(kp.prometheus) } +
+{ ['prometheus-adapter-' + name]: kp.prometheusAdapter[name] for name in std.objectFields(kp.prometheusAdapter) } +
+{ ['grafana-' + name]: kp.grafana[name] for name in std.objectFields(kp.grafana) }
+``` 
+kubectl apply -f manifests/
+
+Check the dashboards:
+https://github.com/coreos/kube-prometheus#access-the-dashboards
+
+Create a service monitor for the cart service: 
+```
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cart-service-monitor
+spec:
+  namespaceSelector:
+      matchNames:
+      - robot-shop
+  selector:
+    matchLabels:
+      service: cart
+  endpoints:
+  - port: http
+```
+kubectl create -f cart-service-monitor.yaml -n monitoring
+
+check http://localhost:9090/config if config was applied
+
+http://localhost:9090/targets if target was found
+
+
 
 install TODO describe the operator magic
 K8s/descriptors/kube-prometheus-robotshop/example.jsonnet
