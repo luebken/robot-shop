@@ -81,6 +81,8 @@ run-load-gen:
 	-kubectl create ns robot-shop-load
 	kubectl run --env HOST=http://$(ROBOTSHOP_IP) --env NUM_CLIENTS=3 loadgen --image robotshop/rs-load -n robot-shop-load
 
+run-artifical-cart-scaler: ## Runs an artifical cart scaler every 4 min
+	kubectl apply -f descriptors/cart-scaler.yaml
 
 help: ## Shows this help message
 	@echo "See Makefile for details. Available make commands are:"

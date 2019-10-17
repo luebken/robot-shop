@@ -18,34 +18,34 @@ spec:
         - /bin/sh
         - -ec
         - |
-          # apk add --no-cache curl
-
-          # kubectl apply -f /etc/config/petclinic-config.yaml
 
           i=0
           scaleup="1"
           while true; do
-            if [[ $(( $i % 100 )) -eq "0" ]]; then
+            if [[ $(( $i % 240 )) -eq "0" ]]; then
               if [[ $scaleup -eq "1" ]]; then
                 r=$(( $RANDOM % 10 + 5 ))
                 kubectl scale deployment cart --replicas $r
-                echo "Scaled up"
+                echo "Scaled up to $r"
                 scaleup="0"
               else
                 kubectl scale deployment cart --replicas 2
-                echo "Scaled down"
+                echo "Scaled down to $r"
                 scaleup="1"
               fi
             fi
-
-            #curl http://petclinic:28080/owners > /dev/null || true
-            #curl http://petclinic:28080/ > /dev/null || true
-            #curl http://petclinic:28080/vets > /dev/null|| true
 
             sleep 1
             i=$((i+1))
             echo "Incremented counter to $i"
           done
+      resources:
+        limits:
+          cpu: 200m
+          memory: 100Mi
+        requests:
+          cpu: 100m
+          memory: 50Mi      
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
