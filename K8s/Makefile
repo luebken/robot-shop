@@ -2,6 +2,26 @@
 
 .DEFAULT_GOAL := help
 
+HUMIO_TOKEN := HUMIO_TOKEN
+
+#
+# Part 0: Setup
+#
+
+init-helm:
+	kubectl -n kube-system create serviceaccount tiller
+	kubectl create clusterrolebinding tiller --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+	helm init --service-account tiller
+
+install-humio:
+	helm repo add humio https://humio.github.io/humio-helm-charts
+	helm repo update
+	helm install -f humio/humio-agent.yaml humio/humio-helm-charts --set humio-fluentbit.token=$(HUMIO_TOKEN) --name humio --namespace logging
+
+delete-humio:
+	helm del --purge humio
+	kubectl delete ns logging
+
 #
 # Part 1: Test just catalogue & cart service
 #
@@ -85,5 +105,8 @@ run-artifical-cart-scaler: ## Runs an artifical cart scaler every 4 min
 	kubectl apply -f descriptors/cart-scaler.yaml
 
 help: ## Shows this help message
+ifeq ($(HUMIO_TOKEN), HUMIO_TOKEN)
+	@echo "Warning: It seems you haven't configured HUMIO_TOKEN in the Makefile."
+endif
 	@echo "See Makefile for details. Available make commands are:"
 	@grep -E '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

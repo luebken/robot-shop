@@ -1,0 +1,5 @@
+humio-fluentbit:
+  enabled: true
+  humioHostname: cloud.humio.com
+  es:
+    tls: true
