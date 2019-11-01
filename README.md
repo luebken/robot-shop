@@ -49,9 +49,15 @@ Fire up Stan's Robot Shop with:
 $ docker-compose up
 ```
 
+If you want to fire up some load as well:
+
+```shell
+$ docker-compose -f docker-compose.yaml -f docker-compose-load.yaml up
+```
+
 If you are running it locally on a Linux host you can also run the Instana [agent](https://docs.instana.io/quick_start/agent_setup/container/docker/) locally, unfortunately the agent is currently not supported on Mac.
 
-There is also limited support on ARM architectures at the moment.
+There is also only limited support on ARM architectures at the moment.
 
 ## Marathon / DCOS
 
@@ -68,6 +74,15 @@ The Docker container images are all available on [Docker Hub](https://hub.docker
 $ kubectl create namespace robot-shop
 $ kubectl -n robot-shop apply -f K8s/descriptors
 ```
+
+Alternatively there is a helm chart for Stan's Robot Shop.
+
+```shell
+$ cd K8s/helm
+$ helm install --name robot-shop --namespace robot-shop .
+```
+
+There are some customisations that can be made see the [README](K8s/helm/README.md).
 
 To deploy the Instana agent to Kubernetes, just use the [helm](https://hub.helm.sh/charts/stable/instana-agent) chart.
 
