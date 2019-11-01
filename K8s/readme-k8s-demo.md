@@ -14,6 +14,11 @@ If not done already install the Instana agent:
     # https://docs.instana.io/quick_start/agent_setup/container/kubernetes/#example-yaml-file
     # kubectl apply -f instana-agent.yaml
 
+    # Operator
+    # https://github.com/instana/instana-agent-operator/
+    # kubectl apply -f instana-agent-operator.yaml
+    # kubectl apply -f instana-agent.customresource.yaml
+
     # Troublshooting
     mkdir instana-agent-logs
     for p in $(kubectl get pods --namespace instana-agent | cut -f 1 -d ' '); do
@@ -54,6 +59,9 @@ The Robot-Shop has the following Kubernetes services and deployments defined in 
 
 ## Catalogue & Cart Services
 
+
+The following steps are powered by the Makefile. Try `make help`
+
 Let's start by creatng the catalogue & cart service with their respective backend services:
 
     # create a dedicated namespace
@@ -63,35 +71,23 @@ Let's start by creatng the catalogue & cart service with their respective backen
     $ kubectl config set-context $(kubectl config current-context) --namespace=robot-shop
 
     # create catalogue deployment & service & mongodb backend
-    # https://github.com/instana/robot-shop/blob/master/catalogue/server.js
-    $ kubectl create -f descriptors/catalogue-deployment.yaml
-    $ kubectl create -f descriptors/catalogue-service.yaml
-    $ kubectl create -f descriptors/mongodb-deployment.yaml
-    $ kubectl create -f descriptors/mongodb-service.yaml
-
     # create cart deploy & service & redis backend
-    # https://github.com/instana/robot-shop/blob/master/cart/server.js
-    $ kubectl create -f descriptors/cart-deployment.yaml
-    $ kubectl create -f descriptors/cart-service.yaml
-    $ kubectl create -f descriptors/redis-deployment.yaml
-    $ kubectl create -f descriptors/redis-service.yaml
+    $ make create-cart-catalogue
 
 
 ## Testing Services
 
 Most microservices are usually not exposed outside of the cluster. For a simple end-to-end test you can temporarily expose that service and test it with curl:
 
+    # 
     # expose the cart service
-    $ kubectl expose deployment cart --type=LoadBalancer --name=test-cart-svc
-    $ EXTERNAL_CART_IP=$(kubectl get svc test-cart-svc -o json | jq -r .status.loadBalancer.ingress[].ip)
-    
-    # test it by curling
-    $ curl $EXTERNAL_CART_IP:8080/add/1/HAL-1/1
-    $ curl $EXTERNAL_CART_IP:8080/cart/1/
-    
-    # testing it by curling it a 100 times
-    $ for i in {1..100}; do curl $EXTERNAL_CART_IP:8080/add/1/HAL-1/1; done
+    $ make expose-cart
 
+    # wait until port is exposed
+
+    # test cart service
+    $ make curl-test-cart
+    
     # delete the test service
     $ kubectl delete svc test-cart-svc
 
