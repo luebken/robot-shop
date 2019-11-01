@@ -1,26 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payment
+  name: cart
   labels:
-    service: payment
-    stage: prod
+    service: cart
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: payment
-      stage: prod
+      service: cart
   template:
     metadata:
       labels:
-        service: payment
-        stage: prod
+        service: cart
     spec:
       containers:
-      - name: payment
-        image: robotshop/rs-payment:latest
-        # agent networking access
+      - name: cart
+        image: {{ .Values.image.repo }}/rs-cart:{{ .Values.image.version }}
+        # agent networking access 
         env:
           - name: INSTANA_AGENT_HOST
             valueFrom:
@@ -35,4 +32,3 @@ spec:
           requests:
             cpu: 100m
             memory: 50Mi
-      restartPolicy: Always

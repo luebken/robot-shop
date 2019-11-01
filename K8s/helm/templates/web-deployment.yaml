@@ -1,31 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payment
+  name: web
   labels:
-    service: payment
-    stage: prod
+    service: web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: payment
-      stage: prod
+      service: web
   template:
     metadata:
       labels:
-        service: payment
-        stage: prod
+        service: web
     spec:
       containers:
-      - name: payment
-        image: robotshop/rs-payment:latest
-        # agent networking access
+      - name: web
+        image: {{ .Values.image.repo }}/rs-web:{{ .Values.image.version }}
+        {{- if .Values.eum.key }}
         env:
-          - name: INSTANA_AGENT_HOST
-            valueFrom:
-              fieldRef:
-                fieldPath: status.hostIP
+        - name: INSTANA_EUM_KEY
+          value: {{ .Values.eum.key }}
+        - name: INSTANA_EUM_REPORTING_URL
+          value: {{ .Values.eum.url }}
+        {{- end}}
         ports:
         - containerPort: 8080
         resources:

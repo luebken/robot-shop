@@ -1,26 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payment
+  name: catalogue
   labels:
-    service: payment
-    stage: prod
+    service: catalogue
 spec:
   replicas: 1
   selector:
     matchLabels:
-      service: payment
-      stage: prod
+      service: catalogue
   template:
     metadata:
       labels:
-        service: payment
-        stage: prod
+        service: catalogue
     spec:
       containers:
-      - name: payment
-        image: robotshop/rs-payment:latest
-        # agent networking access
+      - name: catalogue
+        image: {{ .Values.image.repo }}/rs-catalogue:{{ .Values.image.version }}
         env:
           - name: INSTANA_AGENT_HOST
             valueFrom:

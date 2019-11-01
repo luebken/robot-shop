@@ -2,4 +2,5 @@ uwsgi
 Flask
 requests
 pika
-instana
+prometheus_client
+opentracing
