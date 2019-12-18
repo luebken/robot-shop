@@ -28,15 +28,16 @@ delete-humio:
 install-operator:
 	git clone https://github.com/instana/instana-agent-operator
 	kubectl apply -f instana-agent-operator/deploy/instana-agent-operator.yaml
-	sed -i '' 's/(optional) name of the zone of the host/cluster-luebken-2/g' instana-agent-operator/deploy/instana-agent.customresource.yaml
+	sed -i '' 's/(optional) name of the zone of the host/$(INSTANA_AGENT_ZONE)/g' instana-agent-operator/deploy/instana-agent.customresource.yaml
 	sed -i '' 's/put your Instana agent key here/$(INSTANA_AGENT_KEY)/g' instana-agent-operator/deploy/instana-agent.customresource.yaml
-	sed -i '' 's/the monitoring ingress endpoint/$(INSTANA_AGENT_ENDPOINT)/g' instana-agent-operator/deploy/instana-agent.customresource.yaml
 	sed -i '' 's/the monitoring ingress endpoint port, wrapped in quotes/$(INSTANA_AGENT_ENDPOINT_PORT)/g' instana-agent-operator/deploy/instana-agent.customresource.yaml
+	sed -i '' 's/the monitoring ingress endpoint/$(INSTANA_AGENT_ENDPOINT)/g' instana-agent-operator/deploy/instana-agent.customresource.yaml
 	kubectl apply -f instana-agent-operator/deploy/instana-agent.customresource.yaml
 
 delete-operator:
 	kubectl delete namespace instana-agent
 	kubectl delete CustomResourceDefinition agents.instana.io
+	rm -rf instana-agent-operator
 
 #
 # Part 1: Test just catalogue & cart service
