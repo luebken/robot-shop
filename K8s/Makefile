@@ -124,9 +124,19 @@ create-web:
 	kubectl create -f descriptors/robot-shop/templates/web-deployment.yaml
 	kubectl create -f descriptors/robot-shop/templates/web-service.yaml
 
+#
+# Part 3 Testing
+#
+
 open-robot-shop: ROBOTSHOP_IP=$(shell kubectl get svc web -o json | jq -r .status.loadBalancer.ingress[].ip)## Open the robot shop in the browser
 open-robot-shop: 
 	open http://$(ROBOTSHOP_IP):8080
+
+run-load-gen: ROBOTSHOP_IP=$(shell kubectl get svc web -o json | jq -r .status.loadBalancer.ingress[].ip)## Run a load generator
+run-load-gen:
+	-kubectl create ns robot-shop-load
+	kubectl run --generator=deployment/apps.v1 --env HOST=http://$(ROBOTSHOP_IP):8080 --env NUM_CLIENTS=1 --env RUN_TIME=10m loadgen --image robotshop/rs-load -n robot-shop-load
+
 #
 # Appendix
 #
