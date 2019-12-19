@@ -57,6 +57,53 @@ curl-test-cart:
 delete-test-cart: ## Delete the exposed cart service.
 	kubectl delete svc test-cart-svc
 
+
+#
+# Part 2: Create other services
+#
+
+create-other: create-user create-shipping create-payment create-ratings create-web create-dispatch ## Create other services
+
+# [User service](../user/server.js)
+# mongo & redis already deployed  
+create-user:
+	kubectl create -f descriptors/robot-shop/templates/user-deployment.yaml
+	kubectl create -f descriptors/robot-shop/templates/user-service.yaml
+
+# [Shipping service](../shipping/src/main/java/org/steveww/spark/Main.java)
+# cart already deployed
+create-shipping:
+	kubectl create -f descriptors/robot-shop/templates/shipping-deployment.yaml
+	kubectl create -f descriptors/robot-shop/templates/shipping-service.yaml
+	kubectl create -f descriptors/robot-shop/templates/mysql-deployment.yaml
+	kubectl create -f descriptors/robot-shop/templates/mysql-service.yaml
+
+# [Payment service](../payment/payment.py)
+# cart & user already deployed above
+create-payment:
+	kubectl create -f descriptors/robot-shop/templates/payment-deployment.yaml
+	kubectl create -f descriptors/robot-shop/templates/payment-service.yaml
+	kubectl create -f descriptors/robot-shop/templates/rabbitmq-deployment.yaml
+	kubectl create -f descriptors/robot-shop/templates/rabbitmq-service.yaml
+
+# [Ratings service](../ratings/html/api.php)
+# mysql already deployed above
+create-ratings:
+	kubectl create -f descriptors/robot-shop/templates/ratings-deployment.yaml
+	kubectl create -f descriptors/robot-shop/templates/ratings-service.yaml
+
+create-dispatch:
+	kubectl create -f descriptors/robot-shop/templates/dispatch-deployment.yaml
+	kubectl create -f descriptors/robot-shop/templates/dispatch-service.yaml
+
+# [Web service](../web/default.conf.template)
+create-web:
+	kubectl create -f descriptors/robot-shop/templates/web-deployment.yaml
+	kubectl create -f descriptors/robot-shop/templates/web-service.yaml
+
+open-robot-shop: ROBOTSHOP_IP=$(shell kubectl get svc web -o json | jq -r .status.loadBalancer.ingress[].ip)## Open the robot shop in the browser
+open-robot-shop: 
+	open http://$(ROBOTSHOP_IP):8080
 #
 # Appendix
 #
