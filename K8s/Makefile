@@ -11,7 +11,30 @@ INSTANA_AGENT_ENDPOINT_PORT := INSTANA_AGENT_ENDPOINT_PORT
 # Part 0: Setup
 #
 
-create-k8s-yamls: ## Create yamls from helm templates
+install-operator:
+	git clone https://github.com/instana/instana-agent-operator
+	kubectl apply -f instana-agent-operator/deploy/instana-agent-operator.yaml
+	sed -i '' 's/(optional) name of the zone of the host/$(INSTANA_AGENT_ZONE)/g' instana-agent-operator/deploy/instana-agent.customresource.yaml
+	sed -i '' 's/put your Instana agent key here/$(INSTANA_AGENT_KEY)/g' instana-agent-operator/deploy/instana-agent.customresource.yaml
+	sed -i '' 's/the monitoring ingress endpoint port, wrapped in quotes/$(INSTANA_AGENT_ENDPOINT_PORT)/g' instana-agent-operator/deploy/instana-agent.customresource.yaml
+	sed -i '' 's/the monitoring ingress endpoint/$(INSTANA_AGENT_ENDPOINT)/g' instana-agent-operator/deploy/instana-agent.customresource.yaml
+	kubectl apply -f instana-agent-operator/deploy/instana-agent.customresource.yaml
+
+delete-operator:
+	kubectl delete namespace instana-agent
+	kubectl delete CustomResourceDefinition agents.instana.io
+	rm -rf instana-agent-operator
+
+# yes it's to complicated
+logs-operator: OPERATOR_POD = $(shell kubectl get pods -n instana-agent -l app=instana-agent-operator -o json | jq .items[0].metadata.name)
+logs-operator:
+	kubectl logs $(OPERATOR_POD) -n instana-agent
+logs-agent:
+	kubectl logs --tail=100 -n instana-agent -l app=instana-agent
+check-operator:
+	kubectl get agent/instana-agent -n instana-agent -o json
+
+create-robotshop-k8s-yamls: ## Create robotshop yamls locally from helm templates
 	mkdir ./descriptors
 	helm template --name robot-shop --namespace robot-shop  --output-dir ./descriptors helm/
 
