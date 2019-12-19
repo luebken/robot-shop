@@ -39,6 +39,14 @@ delete-operator:
 	kubectl delete CustomResourceDefinition agents.instana.io
 	rm -rf instana-agent-operator
 
+# yes it's to complicated
+logs-operator: OPERATOR_POD = $(shell kubectl get pods -n instana-agent -l app=instana-agent-operator -o json | jq .items[0].metadata.name)
+logs-operator:
+	kubectl logs $(OPERATOR_POD) -n instana-agent
+logs-agent:
+	kubectl logs --tail=100 -n instana-agent -l app=instana-agent
+
+
 #
 # Part 1: Test just catalogue & cart service
 #
