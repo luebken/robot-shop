@@ -1,0 +1,21 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: load-gen
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: load-gen
+            image: robotshop/rs-load
+            env:
+                - name: HOST
+                  value: "http://35.184.88.232"
+                - name: NUM_CLIENTS
+                  value: "500"
+                - name: RUN_TIME
+                  value: "0h2m"
+          restartPolicy: OnFailure
