@@ -124,7 +124,11 @@ open-robot-shop:
 run-load-gen: ROBOTSHOP_IP=$(shell kubectl get svc web -o json | jq -r .status.loadBalancer.ingress[].ip)## Run a load generator
 run-load-gen:
 	-kubectl create ns robot-shop-load
-	kubectl run --env HOST=http://$(ROBOTSHOP_IP) --env NUM_CLIENTS=3 loadgen --image robotshop/rs-load -n robot-shop-load
+	kubectl run --env HOST=http://$(ROBOTSHOP_IP) --env NUM_CLIENTS=500 --env RUN_TIME=8760h0m loadgen --image robotshop/rs-load -n robot-shop-load
+	# kubectl create -f load-cron-job.yaml -n robot-shop-load
+	# didn't work:  kubectl run --generator=run-pod/v1 loadgen --schedule="*/1 * * * *" --env HOST=http://$(ROBOTSHOP_IP) --env NUM_CLIENTS=500 --env RUN_TIME=0h1m --image robotshop/rs-load -n robot-shop-load
+delete-load-gen:
+	kubectl delete ns robot-shop-load
 
 run-artifical-cart-scaler: ## Runs an artifical cart scaler every 4 min
 	kubectl apply -f descriptors/cart-scaler.yaml
