@@ -137,6 +137,8 @@ run-load-gen:
 	-kubectl create ns robot-shop-load
 	kubectl run --generator=deployment/apps.v1 --env HOST=http://$(ROBOTSHOP_IP):8080 --env NUM_CLIENTS=1 --env RUN_TIME=10m loadgen --image robotshop/rs-load -n robot-shop-load
 
+run-cart-scaler: ## Scales the cart deployment up & down every 5 min
+	kubectl apply -f cart-scaler.yaml
 #
 # Appendix
 #
