@@ -38,6 +38,8 @@
         }).when('/payment', {
             templateUrl: 'payment.html',
             controller: 'paymentform'
+        }).otherwise({
+            redirectTo: '/'
         });
 
         // needed for URL rewrite hash
@@ -131,6 +133,13 @@
             getUniqueid().then((id) => {
                 $scope.data.uniqueid = id;
                 currentUser.uniqueid = id;
+                // update metadata
+                if(typeof ineum !== 'undefined') {
+                    ineum('user', id);
+                    ineum('meta', 'environment', 'production');
+                    ineum('meta', 'variant', 'normal price');
+                }
+
             }).catch((e) => {
                 console.log('ERROR', e);
             });
@@ -140,6 +149,12 @@
         $scope.$watch(() => { return currentUser.uniqueid; }, (newVal, oldVal) => {
             if(newVal !== oldVal) {
                 $scope.data.uniqueid = currentUser.uniqueid;
+                if(typeof ineum !== 'undefined') {
+                    if(! currentUser.uniqueid.startsWith('anonymous')) {
+                        console.log('Setting user details', currentUser);
+                        ineum('user', currentUser.uniqueid, currentUser.user.name, currentUser.user.email);
+                    }
+                }
             }
         });
 
@@ -207,7 +222,7 @@
                 url: url,
                 method: 'PUT'
             }).then((res) => {
-                $scope.data.message = 'Thankyou for your feedback';
+                $scope.data.message = 'Thank you for your feedback';
                 $timeout(clearMessage, 3000);
                 loadRating($scope.data.product.sku);
             }).catch((e) => {

@@ -1,16 +1,10 @@
-FROM golang:1.12.7
+FROM golang:1.14
 
-ENV GOPATH=/go
+WORKDIR /go/src/app
 
-RUN apt-get update && apt-get install -y go-dep
+COPY . .
 
-COPY src/ /go/src/github.com/instana/dispatch
+RUN go get -d -v ./...
+RUN go install -v ./...
 
-WORKDIR /go/src/github.com/instana/dispatch
-
-RUN dep ensure
-RUN go build -o bin/gorcv
-
-# TODO stage this build
-
-CMD bin/gorcv
+CMD dispatch

@@ -6,7 +6,7 @@ You can get more detailed information from my [blog post](https://www.instana.co
 
 This sample microservice application has been built using these technologies:
 - NodeJS ([Express](http://expressjs.com/))
-- Java ([Spark Java](http://sparkjava.com/))
+- Java ([Spring Boot](https://spring.io/))
 - Python ([Flask](http://flask.pocoo.org))
 - Golang
 - PHP (Apache)
@@ -22,13 +22,13 @@ The various services in the sample application already include all required Inst
 To see the application performance results in the Instana dashboard, you will first need an Instana account. Don't worry a [trial account](https://instana.com/trial?utm_source=github&utm_medium=robot_shop) is free.
 
 ## Build from Source
-To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the *.env* file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
+To optionally build from source (you will need a newish version of Docker to do this) use Docker Compose. Optionally edit the `.env` file to specify an alternative image registry and version tag; see the official [documentation](https://docs.docker.com/compose/env-file/) for more information.
 
 ```shell
 $ docker-compose build
 ```
 
-If you modified the *.env* file and changed the image registry, you may need to push the images to that registry
+If you modified the `.env` file and changed the image registry, you need to push the images to that registry
 
 ```shell
 $ docker-compose push
@@ -68,75 +68,36 @@ You may install Instana via the DCOS package manager, instructions are here: htt
 ## Kubernetes
 You can run Kubernetes locally using [minikube](https://github.com/kubernetes/minikube) or on one of the many cloud providers.
 
-The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/). The deployment and service definition files using these images are in the [K8s](K8s/README.md) directory, use these to deploy to a Kubernetes cluster. If you pushed your own images to your registry the deployment files will need to be updated to pull from your registry.
+The Docker container images are all available on [Docker Hub](https://hub.docker.com/u/robotshop/).
 
-```shell
-$ kubectl create namespace robot-shop
-$ kubectl -n robot-shop apply -f K8s/descriptors
-```
-
-Alternatively there is a helm chart for Stan's Robot Shop.
-
-```shell
-$ cd K8s/helm
-$ helm install --name robot-shop --namespace robot-shop .
-```
-
-There are some customisations that can be made see the [README](K8s/helm/README.md).
+Install Stan's Robot Shop to your Kubernetes cluster using the [Helm](K8s/helm/README.md) chart.
 
 To deploy the Instana agent to Kubernetes, just use the [helm](https://hub.helm.sh/charts/stable/instana-agent) chart.
-
-```shell
-$ helm install --name instana-agent --namespace instana-agent \
---set agent.key=INSTANA_AGENT_KEY \
---set agent.endpointHost=HOST \
---set agent.endpointPort=PORT \
---set zone.name=CLUSTER_NAME \
-stable/instana-agent
-```
-
-If you are having difficulties getting helm running with your K8s install, it is most likely due to RBAC, most K8s now have RBAC enabled by default. Therefore helm requires a [service account](https://github.com/helm/helm/blob/master/docs/rbac.md) to have permission to do stuff.
 
 ## Accessing the Store
 If you are running the store locally via *docker-compose up* then, the store front is available on localhost port 8080 [http://localhost:8080](http://localhost:8080/)
 
-If you are running the store on Kubernetes via minikube then, to make the store front accessible edit the *web* service definition and change the type to *NodePort* and add a port entry *nodePort: 30080*.
-
-```shell
-$ kubectl -n robot-shop edit service web
-```
-
-Snippet
-
-```yaml
-spec:
-  ports:
-  - name: "8080"
-    port: 8080
-    protocol: TCP
-    targetPort: 8080
-    nodePort: 30080
-  selector:
-    service: web
-  sessionAffinity: None
-  type: NodePort
-```
-
-The store front is then available on the IP address of minikube port 30080. To find the IP address of your minikube instance.
+If you are running the store on Kubernetes via minikube then, find the IP address of Minikube and the Node Port of the web service.
 
 ```shell
 $ minikube ip
+$ kubectl get svc web
 ```
 
 If you are using a cloud Kubernetes / Openshift / Mesosphere then it will be available on the load balancer of that system.
 
 ## Load Generation
-A separate load generation utility is provided in the *load-gen* directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The *build.sh* script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the *.env* file in the parent directory. The script *load-gen.sh* runs the image, it takes a number of command line arguments. You could run the container inside an orchestration system (K8s) as well if you want to, an example descriptor is provided in K8s/autoscaling. For more details see the [README](load-gen/README.md) in the load-gen directory.
+A separate load generation utility is provided in the `load-gen` directory. This is not automatically run when the application is started. The load generator is built with Python and [Locust](https://locust.io). The `build.sh` script builds the Docker image, optionally taking *push* as the first argument to also push the image to the registry. The registry and tag settings are loaded from the `.env` file in the parent directory. The script `load-gen.sh` runs the image, it takes a number of command line arguments. You could run the container inside an orchestration system (K8s) as well if you want to, an example descriptor is provided in K8s directory. For more details see the [README](load-gen/README.md) in the load-gen directory.
 
-## End User Monitoring
-To enable End User Monitoring (EUM) see the official [documentation](https://docs.instana.io/products/website_monitoring/) for how to create a configuration. There is no need to inject the javascript fragment into the page, this will be handled automatically. Just make a note of the unique key and set the environment variable INSTANA_EUM_KEY for the *web* image, see *docker-compose.yaml* for an example.
+## Website Monitoring / End-User Monitoring
 
-If you are running the Instana backend on premise, you will also need to set the Reporting URL to your local instance. Set the environment variable INSTANA_EUM_REPORTING_URL as above. See the Instana EUM API [reference](https://docs.instana.io/products/website_monitoring/api/#api-structure)
+### Docker Compose
+
+To enable Website Monioring / End-User Monitoring (EUM) see the official [documentation](https://docs.instana.io/website_monitoring/) for how to create a configuration. There is no need to inject the JavaScript fragment into the page, this will be handled automatically. Just make a note of the unique key and set the environment variable `INSTANA_EUM_KEY` and `INSTANA_EUM_REPORTING_URL` for the web image within `docker-compose.yaml`.
+
+### Kubernetes
+
+The Helm chart for installing Stan's Robot Shop supports setting the key and endpoint url required for website monitoring, see the [README](K8s/helm/README.md).
 
 ## Prometheus
 

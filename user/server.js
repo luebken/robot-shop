@@ -41,6 +41,20 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use((req, res, next) => {
+    let dcs = [
+        "asia-northeast2",
+        "asia-south1",
+        "europe-west3",
+        "us-east1",
+        "us-west1"
+    ];
+    let span = instana.currentSpan();
+    span.annotate('custom.sdk.tags.datacenter', dcs[Math.floor(Math.random() * dcs.length)]);
+
+    next();
+});
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -54,7 +68,6 @@ app.get('/health', (req, res) => {
 
 // use REDIS INCR to track anonymous users
 app.get('/uniqueid', (req, res) => {
-    req.log.error('Unique ID test');
     // get number from Redis
     redisClient.incr('anonymous-counter', (err, r) => {
         if(!err) {
@@ -257,11 +270,11 @@ redisClient.on('ready', (r) => {
 function mongoConnect() {
     return new Promise((resolve, reject) => {
         var mongoURL = process.env.MONGO_URL || 'mongodb://mongodb:27017/users';
-        mongoClient.connect(mongoURL, (error, _db) => {
+        mongoClient.connect(mongoURL, (error, client) => {
             if(error) {
                 reject(error);
             } else {
-                db = _db;
+                db = client.db('users');
                 usersCollection = db.collection('users');
                 ordersCollection = db.collection('orders');
                 resolve('connected');

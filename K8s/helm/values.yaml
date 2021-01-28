@@ -3,6 +3,7 @@
 image:
   repo: robotshop
   version: latest
+  pullPolicy: IfNotPresent
 
 # Alternative payment gateway URL
 # Default is https://www.paypal.com
@@ -17,3 +18,16 @@ eum:
   url: https://eum-eu-west-1.instana.io
   #url: https://eum-us-west-2.instana.io
 
+# Pod Security Policy
+psp:
+  enabled: false
+
+# For the mini ones minikube, minishift set to true
+nodeport: false
+
+# "special" Openshift. Set to true when deploying to any openshift flavour
+openshift: false
+
+# Storage class to use with redis statefulset.
+redis:
+  storageClassName: standard
